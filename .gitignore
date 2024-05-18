@@ -9,3 +9,6 @@
 
 # Ignore .vscode folder
 **/.vscode/
+
+# Ignore sample_videos folder
+**/sample_videos/

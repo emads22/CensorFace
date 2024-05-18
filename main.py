@@ -36,16 +36,20 @@ def prompt_user_for_video(video_paths):
             print("\n\n---> Invalid input. Please enter a number. <---\n")
 
 
-def prompt_user_for_method():
+def prompt_user_for_method(video_name):
     """
     Prompts the user to select a method for censoring faces in the video.
 
+    Args:
+        video_name (str): The name of the video for which the user is selecting the censoring method.
+
     Returns:
-        choice (str): The selected method for censoring faces ('1' for Blur, '2' for Box, '3' for Cat).
+        str: The selected method for censoring faces ('1' for Blur, '2' for Box, '3' for Cat).
     """
     while True:
         # Prompt user for input
-        print("\n- Please select a method for censoring faces in the video:\n")
+        print(
+            f'\n- Please select a method for censoring faces in the video "{video_name}":\n')
         for idx, method in enumerate(CENSORING_METHODS, start=1):
             print(f"  {idx}. {method.title()}")
 
@@ -80,7 +84,7 @@ def main():
 
     # Get list of all video files in the current directory
     video_paths = [path for path in VIDEOS_DIR.iterdir()
-                   if path.suffix.upper() in VIDEOS_EXTENSIONS]
+                   if path.suffix.lower() in VIDEOS_EXTENSIONS]
 
     # Check if there are any video files in the directory
     if not video_paths:
@@ -93,38 +97,18 @@ def main():
     print(f"\n\n{LINE_SEPARATOR}\n")
 
     # Get user input for the method
-    method = prompt_user_for_method()
+    method = prompt_user_for_method(source_video.name)
 
     # Print a message indicating the start of the censoring process
-    print(
-        f'\n\n\n---> Censoring faces and generating output AVI video: "{source_video.stem}_censored_faces_{method.lower()}.avi" ...\n')
+    print(f'\n\n\n---> Censoring faces using "{method.title()}" method and generating output AVI video: "{
+          source_video.stem}_censored_faces_{method.lower()}.avi" ...\n')
 
-    # Validate user input and call the appropriate face-censoring method
-    match method:
-
-        case '1':
-            try:
-                # Apply blur method to censor faces in the video
-                censor_faces(video_path=source_video, method='blur')
-            except Exception as error:
-                print(f"\n--- An error occurred: {error} ---\n")
-                raise
-
-        case '2':
-            try:
-                # Apply box method to censor faces in the video
-                censor_faces(video_path=source_video, method='box')
-            except Exception as error:
-                print(f"\n--- An error occurred: {error} ---\n")
-                raise
-
-        case '3':
-            try:
-                # Apply cat method to censor faces in the video
-                censor_faces(video_path=source_video, method='cat')
-            except Exception as error:
-                print(f"\n--- An error occurred: {error} ---\n")
-                raise
+    try:
+        # Apply selected method to censor faces in the video
+        censor_faces(video_path=source_video, method=method)
+    except Exception as error:
+        print(f"\n--- An error occurred: {error} ---\n")
+        raise
 
     # Print a message indicating successful completion of the face censoring process
     print("\n---> Face censoring completed successfully. Output AVI video created. <---\n")

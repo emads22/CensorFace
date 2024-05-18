@@ -84,7 +84,7 @@ def blur_faces_in_frame(image):
 
     Notes:
         - This function uses a pre-trained cascade classifier to detect faces in the input image.
-        - Detected faces are blurred using a Gaussian blur filter with a kernel size of (45, 45).
+        - Detected faces are blurred using a Gaussian blur filter with a kernel size of (51, 51).
         - The standard deviation of the Gaussian kernel is automatically calculated based on the kernel size.
         - Detected faces are replaced with heavily blurred regions in the input image.
 
@@ -106,10 +106,12 @@ def blur_faces_in_frame(image):
         # 'start_y' and 'end_y' represent the vertical range, and 'start_x' and 'end_x' represent the horizontal range.
         roi = image[start_y:end_y, start_x:end_x]
 
-        # Apply heavy Gaussian blur to the ROI to obscure the face with a kernel size of (45, 45)
-        # (45, 45): Size of the Gaussian kernel for blurring. Larger values result in heavier blurring.
+        # Apply heavy Gaussian blur to the ROI to obscure the face with a kernel size of (51, 51)
+        # (51, 51): Size of the Gaussian kernel for blurring. Larger values result in heavier blurring. Values must be odd not even.
         # 0: Standard deviation of the Gaussian kernel along the X and Y directions. A value of 0 indicates automatic calculation based on the kernel size. It controls the amount of blurring.
-        blurred_roi = cv2.GaussianBlur(roi, (45, 45), 0)
+        blurred_roi = cv2.GaussianBlur(roi, (51, 51), 0)
+
+        # We could use "cv2.blur()" but "cv2.GaussianBlur()" applies a Gaussian blur, which tends to produce smoother and more natural-looking results, while "cv2.blur()" applies a simple or average blur, which can be faster but may not preserve edges as well as Gaussian blur.
 
         # Replace the original detected face region in the image with the heavily blurred face region
         image[start_y:end_y, start_x:end_x] = blurred_roi
@@ -147,7 +149,7 @@ def box_faces_in_frame(image):
         # - `(x, y)`: Coordinates of the top-left corner of the rectangle.
         # - `(x + width, y + height)`: Coordinates of the bottom-right corner of the rectangle.
         # - `BOX_COLOR`: Color of the rectangle (constant defined).
-        # - `thickness=cv2.FILLED`: Specifies the thickness of the rectangle's outline , here it specifies that the rectangle should be filled rather than just outlined.
+        # - `thickness=cv2.FILLED`: Specifies the thickness of the rectangle's outline , here its -1 which specifies that the rectangle should be filled rather than just outlined.
         cv2.rectangle(image, (x, y), (x + width, y + height),
                       BOX_COLOR, thickness=cv2.FILLED)
 
@@ -177,6 +179,9 @@ def cat_faces_in_frame(image):
     # Detect faces in the input image
     faces = detect_faces_in_image(image)
 
+    # Load the cat face image
+    cat_img = cv2.imread(str(CAT_FACE))
+
     # Iterate over each detected face (rectangle) in the 'faces' array (in the image)
     for (x, y, width, height) in faces:
         # Calculate the coordinates of the corners of the detected face rectangle
@@ -184,9 +189,6 @@ def cat_faces_in_frame(image):
         end_y = y + height  # Ending y-coordinate of the detected face rectangle
         start_x = x  # Starting x-coordinate of the detected face rectangle
         end_x = x + width  # Ending x-coordinate of the detected face rectangle
-
-        # Load the cat face image
-        cat_img = cv2.imread(str(CAT_FACE))
 
         # Resize the cat face image to match the size of the detected face region
         # - `cv2.resize()`: Resizes the input image to the specified dimensions.
@@ -203,13 +205,13 @@ def cat_faces_in_frame(image):
     return image
 
 
-def censor_faces(video_path, method="blur"):
+def censor_faces(video_path, method):
     """
     Anonymize faces in a video using specified method.
 
     Args:
         video_path (str): Path to the input video file.
-        method (str, optional): Method for anonymizing faces. Options are 'blur' (default), 'box', or 'cat'.
+        method (str): Method for anonymizing faces. Options are "blur", "box", or "cat".
 
     Raises:
         Exception: If the video file could not be opened or if an error occurs during video processing.
@@ -258,17 +260,17 @@ def censor_faces(video_path, method="blur"):
             if not success:
                 break  # Break the loop if no frame is read or end of video
 
-            # Match method ('blur', 'box', or 'cat'), this switch statement matches the method specified for face anonymization.
+            # Match method ("blur", "box", or "cat"), this switch statement matches the method specified for face anonymization.
             match method.lower():
-                case 'blur':
+                case "blur":
                     # Blur the faces in the current frame
                     new_frame = blur_faces_in_frame(frame)
 
-                case 'box':
+                case "box":
                     # Replace the faces with gray boxes in the current frame
                     new_frame = box_faces_in_frame(frame)
 
-                case 'cat':
+                case "cat":
                     # Replace the faces with cat pic in the current frame
                     new_frame = cat_faces_in_frame(frame)
 
