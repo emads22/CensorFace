@@ -231,7 +231,7 @@ def censor_faces(video_path, method="blur"):
         # Define the output video path (Create the output directory if it doesn't exist)
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         output_video_path = OUTPUT_DIR / \
-            f"{video_path.stem}_censored_faces.avi"
+            f"{video_path.stem}_censored_faces_{method.lower()}.avi"
 
         # codec = int(v_info['codec'])  # Define the codec for the output video
         # Using same codec and format (type extension) as source video would give warnings and sometimes errors depending on source video format and codec (like FFMPEG related errors and warnings) so best solution is to use ".avi" type extension and codec for the output video (DIVX is a common choice for AVI format)
