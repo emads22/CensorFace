@@ -153,6 +153,24 @@ def box_faces_in_frame(image):
 
 
 def cat_faces_in_frame(image):
+    """
+    Detect faces in the input image/frame and replace them with cat faces.
+
+    Args:
+        image (numpy.ndarray): Input image (BGR format) containing faces to be replaced.
+
+    Returns:
+        numpy.ndarray: Image with detected faces replaced by cat faces.
+
+    Notes:
+        - This function utilizes a pre-trained cascade classifier for face detection.
+        - Detected faces are represented as rectangles (bounding boxes) enclosing each face.
+        - Cat faces are loaded from an external image file and resized to match the size of detected faces.
+        - Detected faces in the input image are replaced by the resized cat faces.
+        - The cat face image file path is specified by the constant 'CAT_FACE'.
+        - The resized cat face image is placed into the region of the original image corresponding to the detected face.
+
+    """
     # Load the pre-trained cascade classifier for face detection
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -181,25 +199,25 @@ def cat_faces_in_frame(image):
         start_x = x  # Starting x-coordinate of the detected face rectangle
         end_x = x + width  # Ending x-coordinate of the detected face rectangle
 
-        # Extract the region of interest (ROI) within the rectangle which is the detected face region from the original image
-        # In OpenCV, image slicing is performed as image[y:y+h, x:x+w].
-        # Therefore, we start with the y-coordinate (vertical) followed by the x-coordinate (horizontal) to extract the desired region.
-        # 'start_y' and 'end_y' represent the vertical range, and 'start_x' and 'end_x' represent the horizontal range.
-        roi = image[start_y:end_y, start_x:end_x]
+        # Load the cat face image
+        cat_img = cv2.imread(str(CAT_FACE))
 
-        # Apply heavy Gaussian blur to the ROI to obscure the face with a kernel size of (45, 45)
-        # (45, 45): Size of the Gaussian kernel for blurring. Larger values result in heavier blurring.
-        # 0: Standard deviation of the Gaussian kernel along the X and Y directions. A value of 0 indicates automatic calculation based on the kernel size. It controls the amount of blurring.
-        blurred_roi = cv2.GaussianBlur(roi, (45, 45), 0)
+        # Resize the cat face image to match the size of the detected face region
+        # - `cv2.resize()`: Resizes the input image to the specified dimensions.
+        # - `cat_img`: The input cat face image to be resized.
+        # - `(width, height)`: Target dimensions for resizing, obtained from the detected face region.
+        resized_cat_img = cv2.resize(cat_img, (width, height))
 
-        # Replace the original detected face region in the image with the heavily blurred face region
-        image[start_y:end_y, start_x:end_x] = blurred_roi
+        # Replace the region of the original image containing the detected face with the resized cat face image
+        # - `image[start_y:end_y, start_x:end_x]`: Selects the region of the original image corresponding to the detected face.
+        # - `resized_cat_img`: Replaces the selected region with the resized cat face image.
+        image[start_y:end_y, start_x:end_x] = resized_cat_img
 
     # Return the modified image object
     return image
 
 
-def censor_faces(video_path, method="box"):
+def censor_faces(video_path, method="cat"):
     """
     Anonymize faces in a video using specified method.
 
@@ -227,7 +245,7 @@ def censor_faces(video_path, method="box"):
         # Define the output video path (Create the output directory if it doesn't exist)
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         output_video_path = OUTPUT_DIR / \
-            f"{video_path.stem}_masked_faces.avi"
+            f"{video_path.stem}_censored_faces.avi"
 
         # codec = int(v_info['codec'])  # Define the codec for the output video
         # Using same codec and format (type extension) as source video would give warnings and sometimes errors depending on source video format and codec (like FFMPEG related errors and warnings) so best solution is to use ".avi" type extension and codec for the output video (DIVX is a common choice for AVI format)
