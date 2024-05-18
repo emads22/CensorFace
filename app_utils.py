@@ -91,4 +91,80 @@ def cat_faces_in_frame():
 
 
 def censor_faces(video_path, method="box"):
-    pass
+    """
+    Anonymize faces in a video using specified method.
+
+    Args:
+        video_path (str): Path to the input video file.
+        method (str, optional): Method for anonymizing faces. Options are 'blur' (default), 'box', or 'cat'.
+
+    Raises:
+        Exception: If the video file could not be opened or if an error occurs during video processing.
+
+    Returns:
+        None
+    """
+    try:
+        # Create a VideoCapture object to read the video file
+        video = cv2.VideoCapture(str(video_path))
+
+        if not video.isOpened():
+            # Exit program if the video file could not be opened
+            raise Exception("\n--- Error: Could not open video. ---\n")
+
+        # Prepare to write the modified video
+        v_info = get_video_info(video)
+
+        # Define the output video path (Create the output directory if it doesn't exist)
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        output_video_path = OUTPUT_DIR / \
+            f"{video_path.stem}_masked_faces.avi"
+
+        # codec = int(v_info['codec'])  # Define the codec for the output video
+        # Using same codec and format (type extension) as source video would give warnings and sometimes errors depending on source video format and codec (like FFMPEG related errors and warnings) so best solution is to use ".avi" type extension and codec for the output video (DIVX is a common choice for AVI format)
+        # cv2.VideoWriter_fourcc() expects the format "cv2.VideoWriter_fourcc('D', 'I', 'V', 'X')" to specify the codec so we use `*` to unpack the string "DIVX" (iterable)
+        codec = cv2.VideoWriter_fourcc(*"DIVX")  # type: 'int'
+        fps = int(v_info['fps'])
+        width = int(v_info['frame_width'])
+        height = int(v_info['frame_height'])
+
+        # Specify the output video file path, codec, frames per second, and frame size
+        # Arguments:
+        # - output_video_path: Path to the output video file
+        # - fourcc: Four-character code representing the codec (e.g., 'DIVX' for DivX codec)
+        # - fps: Frames per second (FPS) of the output video
+        # - (width, height): Tuple representing the frame size (width, height) of the output video
+        output_video = cv2.VideoWriter(filename=str(
+            output_video_path), fourcc=codec, fps=fps, frameSize=(width, height))
+
+        while True:
+            # Read a frame from the video
+            success, frame = video.read()
+
+            # Check if frame was successfully read
+            if not success:
+                break  # Break the loop if no frame is read or end of video
+
+            # Match method ('blur', 'box', or 'cat'), this switch statement matches the method specified for face anonymization.
+            match method.lower():
+                case 'blur':
+                    # Blur the faces in the current frame
+                    new_frame = blur_faces_in_frame(frame)
+
+                case 'box':
+                    # Replace the faces with gray boxes in the current frame
+                    new_frame = box_faces_in_frame(frame)
+
+                case 'cat':
+                    # Replace the faces with cat pic in the current frame
+                    new_frame = cat_faces_in_frame(frame)
+
+            # Write the modified frame to the output video
+            output_video.write(new_frame)
+
+        # Release resources
+        video.release()
+        output_video.release()
+    except Exception as e:
+        print(f"\n--- An error occurred during video processing: {e} ---\n")
+        raise
