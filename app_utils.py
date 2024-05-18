@@ -37,7 +37,7 @@ def get_video_info(video):
 
 def blur_faces_in_frame(image):
     """
-    Apply heavy Gaussian blur to detected faces in the input image.
+    Apply heavy Gaussian blur to detected faces in the input image/frame.
 
     Args:
         image (numpy.ndarray): Input image (BGR format) containing faces to be blurred.
@@ -99,6 +99,22 @@ def blur_faces_in_frame(image):
 
 
 def box_faces_in_frame(image):
+    """
+    Detect faces in the input image/frame and draw colored rectangles around them.
+
+    Args:
+        image (numpy.ndarray): Input image (BGR format) containing faces to be boxed.
+
+    Returns:
+        numpy.ndarray: Image with detected faces boxed with gray rectangles.
+
+    Notes:
+        - This function utilizes a pre-trained cascade classifier for face detection.
+        - Detected faces are represented as rectangles (bounding boxes) enclosing each face.
+        - The color of the rectangles is specified in constants.py in the code as 'BOX_COLOR'.
+        - The rectangles are drawn with a thickness specified as 'cv2.FILLED', resulting in filled rectangles around the detected faces.
+
+    """
     # Load the pre-trained cascade classifier for face detection
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -123,13 +139,20 @@ def box_faces_in_frame(image):
     for (x, y, width, height) in faces:
 
         # Draw a rectangle around the detected face on the image
-        cv2.rectangle(image, (x, y), (x + width, y + height), BOX_COLOR, thickness=cv2.FILLED)
+        # - `cv2.rectangle()`: Draws a rectangle on the image.
+        # - `image`: The image on which the rectangle is drawn.
+        # - `(x, y)`: Coordinates of the top-left corner of the rectangle.
+        # - `(x + width, y + height)`: Coordinates of the bottom-right corner of the rectangle.
+        # - `BOX_COLOR`: Color of the rectangle (constant defined).
+        # - `thickness=cv2.FILLED`: Specifies the thickness of the rectangle's outline , here it specifies that the rectangle should be filled rather than just outlined.
+        cv2.rectangle(image, (x, y), (x + width, y + height),
+                      BOX_COLOR, thickness=cv2.FILLED)
 
     # Return the modified image object
     return image
 
 
-def cat_faces_in_frame():
+def cat_faces_in_frame(image):
     # Load the pre-trained cascade classifier for face detection
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
