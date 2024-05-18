@@ -35,22 +35,18 @@ def get_video_info(video):
     return video_info
 
 
-def blur_faces_in_frame(image):
+def detect_faces_in_image(image):
     """
-    Apply heavy Gaussian blur to detected faces in the input image/frame.
+    Detect faces in the input image using a pre-trained cascade classifier.
 
     Args:
-        image (numpy.ndarray): Input image (BGR format) containing faces to be blurred.
+        image (numpy.ndarray): Input image in BGR format.
 
     Returns:
-        numpy.ndarray: Image with detected faces blurred.
-
-    Notes:
-        - This function uses a pre-trained cascade classifier to detect faces in the input image.
-        - Detected faces are blurred using a Gaussian blur filter with a kernel size of (45, 45).
-        - The standard deviation of the Gaussian kernel is automatically calculated based on the kernel size.
-        - Detected faces are replaced with heavily blurred regions in the input image.
-
+        numpy.ndarray: Array containing information about detected faces.
+            Each element of the array represents a rectangle (bounding box) that encloses a detected face.
+            The elements consist of coordinates (x, y, width, height) specifying the position and size of each detected face within the image.
+            These coordinates define rectangular regions within the image where faces are detected.
     """
     # Load the pre-trained cascade classifier for face detection
     face_cascade = cv2.CascadeClassifier(
@@ -71,6 +67,30 @@ def blur_faces_in_frame(image):
     # Uncomment the following two lines to display them for testing
     # print(type(faces), end=": ")
     # pprint(faces)
+
+    # Return the array containing information about detected faces
+    return faces
+
+
+def blur_faces_in_frame(image):
+    """
+    Apply heavy Gaussian blur to detected faces in the input image/frame.
+
+    Args:
+        image (numpy.ndarray): Input image (BGR format) containing faces to be blurred.
+
+    Returns:
+        numpy.ndarray: Image with detected faces blurred.
+
+    Notes:
+        - This function uses a pre-trained cascade classifier to detect faces in the input image.
+        - Detected faces are blurred using a Gaussian blur filter with a kernel size of (45, 45).
+        - The standard deviation of the Gaussian kernel is automatically calculated based on the kernel size.
+        - Detected faces are replaced with heavily blurred regions in the input image.
+
+    """
+    # Detect faces in the input image
+    faces = detect_faces_in_image(image)
 
     # Iterate over each detected face (rectangle) in the 'faces' array (in the image)
     for (x, y, width, height) in faces:
@@ -115,25 +135,8 @@ def box_faces_in_frame(image):
         - The rectangles are drawn with a thickness specified as 'cv2.FILLED', resulting in filled rectangles around the detected faces.
 
     """
-    # Load the pre-trained cascade classifier for face detection
-    face_cascade = cv2.CascadeClassifier(
-        cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-    # Convert the image to grayscale for convenience and noice reduction and faster processing
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Detect faces in the grayscale image using the detectMultiScale function of the face cascade classifier
-    # The parameters 1.1 and 4 control the scale factor and minimum number of neighbors respectively
-    faces = face_cascade.detectMultiScale(
-        gray_image, scaleFactor=1.1, minNeighbors=4)
-
-    # 'faces' is a numpy array holds information about the detected faces within the image.
-    # Each element of 'faces' represents a rectangle (bounding box) that encloses a detected face.
-    # The elements consist of coordinates (x, y, width, height) specifying the position and size of each detected face within the image.
-    # These coordinates define rectangular regions within the image where faces are detected.
-    # Uncomment the following two lines to display them for testing
-    # print(type(faces), end=": ")
-    # pprint(faces)
+    # Detect faces in the input image
+    faces = detect_faces_in_image(image)
 
     # Iterate over each detected face (rectangle) in the 'faces' array (in the image)
     for (x, y, width, height) in faces:
@@ -171,25 +174,8 @@ def cat_faces_in_frame(image):
         - The resized cat face image is placed into the region of the original image corresponding to the detected face.
 
     """
-    # Load the pre-trained cascade classifier for face detection
-    face_cascade = cv2.CascadeClassifier(
-        cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-    # Convert the image to grayscale for convenience and noice reduction and faster processing
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Detect faces in the grayscale image using the detectMultiScale function of the face cascade classifier
-    # The parameters 1.1 and 4 control the scale factor and minimum number of neighbors respectively
-    faces = face_cascade.detectMultiScale(
-        gray_image, scaleFactor=1.1, minNeighbors=4)
-
-    # 'faces' is a numpy array holds information about the detected faces within the image.
-    # Each element of 'faces' represents a rectangle (bounding box) that encloses a detected face.
-    # The elements consist of coordinates (x, y, width, height) specifying the position and size of each detected face within the image.
-    # These coordinates define rectangular regions within the image where faces are detected.
-    # Uncomment the following two lines to display them for testing
-    # print(type(faces), end=": ")
-    # pprint(faces)
+    # Detect faces in the input image
+    faces = detect_faces_in_image(image)
 
     # Iterate over each detected face (rectangle) in the 'faces' array (in the image)
     for (x, y, width, height) in faces:
@@ -217,7 +203,7 @@ def cat_faces_in_frame(image):
     return image
 
 
-def censor_faces(video_path, method="cat"):
+def censor_faces(video_path, method="blur"):
     """
     Anonymize faces in a video using specified method.
 
