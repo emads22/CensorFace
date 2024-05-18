@@ -99,7 +99,34 @@ def blur_faces_in_frame(image):
 
 
 def box_faces_in_frame(image):
-    pass
+    # Load the pre-trained cascade classifier for face detection
+    face_cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    # Convert the image to grayscale for convenience and noice reduction and faster processing
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Detect faces in the grayscale image using the detectMultiScale function of the face cascade classifier
+    # The parameters 1.1 and 4 control the scale factor and minimum number of neighbors respectively
+    faces = face_cascade.detectMultiScale(
+        gray_image, scaleFactor=1.1, minNeighbors=4)
+
+    # 'faces' is a numpy array holds information about the detected faces within the image.
+    # Each element of 'faces' represents a rectangle (bounding box) that encloses a detected face.
+    # The elements consist of coordinates (x, y, width, height) specifying the position and size of each detected face within the image.
+    # These coordinates define rectangular regions within the image where faces are detected.
+    # Uncomment the following two lines to display them for testing
+    # print(type(faces), end=": ")
+    # pprint(faces)
+
+    # Iterate over each detected face (rectangle) in the 'faces' array (in the image)
+    for (x, y, width, height) in faces:
+
+        # Draw a rectangle around the detected face on the image
+        cv2.rectangle(image, (x, y), (x + width, y + height), BOX_COLOR, thickness=cv2.FILLED)
+
+    # Return the modified image object
+    return image
 
 
 def cat_faces_in_frame():
