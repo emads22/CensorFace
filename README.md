@@ -20,6 +20,9 @@ The tool provides an interactive user interface, guiding users through the proce
 - **Interactive User Interface**: The script prompts the user to select a video file and a method for censoring faces.
 - **Output Generation**: Generates a new video file with censored faces based on the chosen method.
 
+## Technologies Used
+- **opencv-python**: A library for computer vision and image processing.
+
 ## Algorithms Used
 The script utilizes the following main OpenCV algorithms:
 - **Haar Cascade Classifier**: Used for face detection in images.
@@ -42,6 +45,8 @@ The script utilizes the following main OpenCV algorithms:
 2. Follow the prompts to select a video file and a method for censoring faces.
 3. The script will process the video. Please note that depending on the video format and size, the censoring process may take several minutes. **`Kindly be patient during processing`**.
 4. Upon completion, the output AVI video with censored faces will be saved in the `assets/output` directory.
+
+ - **Note**: Some sample MP4 video files are included in `assets\videos` for testing and demonstration.
 
 ### Sample Videos
 For testing purposes, sample videos have been provided along with their corresponding outputs after testing. You can make use of these sample videos to familiarize yourself with the tool and its capabilities.
