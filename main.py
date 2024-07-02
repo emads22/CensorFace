@@ -1,6 +1,6 @@
 import sys
 from app_utils import censor_faces
-from constants import VIDEOS_DIR, VIDEOS_EXTENSIONS, LINE_SEPARATOR, CENSORING_METHODS
+from constants import ASCII_ART, VIDEOS_DIR, VIDEOS_EXTENSIONS, LINE_SEPARATOR, CENSORING_METHODS
 
 
 def prompt_user_for_video(video_paths):
@@ -81,6 +81,9 @@ def main():
     4. Prompt the user to select a method for censoring faces (blur, box, or cat).
     5. Process the selected video with the chosen method and generate an output AVI video.
     """
+
+    # Display ASCII art
+    print("\n\n", ASCII_ART, "\n")
 
     # Get list of all video files in the current directory
     video_paths = [path for path in VIDEOS_DIR.iterdir()
