@@ -1,5 +1,7 @@
 # CensorFace Video Tool
 
+![CensorFace_logo](./assets/images/CensorFace_logo.png)
+
 ```bash
 
  ██████ ███████ ███    ██ ███████  ██████  ██████  ███████  █████   ██████ ███████ 
