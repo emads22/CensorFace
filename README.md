@@ -2,16 +2,6 @@
 
 ![CensorFace_logo](./assets/images/CensorFace_logo.png)
 
-```bash
-
- ██████ ███████ ███    ██ ███████  ██████  ██████  ███████  █████   ██████ ███████ 
-██      ██      ████   ██ ██      ██    ██ ██   ██ ██      ██   ██ ██      ██      
-██      █████   ██ ██  ██ ███████ ██    ██ ██████  █████   ███████ ██      █████   
-██      ██      ██  ██ ██      ██ ██    ██ ██   ██ ██      ██   ██ ██      ██      
- ██████ ███████ ██   ████ ███████  ██████  ██   ██ ██      ██   ██  ██████ ███████ 
- 
-```
-
 ## Overview
 CensorFace Video Tool is a Python script designed to enhance privacy in videos by censoring faces. It offers various methods such as `blurring`, `boxing`, or even replacing faces with `cat face` images. This tool is particularly useful for scenarios where individuals in videos need to be anonymized for privacy reasons, such as public footage or sensitive content.
 
